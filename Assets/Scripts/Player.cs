@@ -6,15 +6,18 @@ public class Player : MonoBehaviour
 {
     [SerializeField] private float _speed;
 
+    private int _rightDirection = 1;
+    private int _leftDirection = -1;
+
     private void Update()
     {
         if (Input.GetKey(KeyCode.D))
         {
-            Move(1);
+            Move(_rightDirection);
         }
         if (Input.GetKey(KeyCode.A))
         {
-            Move(-1);
+            Move(_leftDirection);
         }
     }
 
