@@ -2,12 +2,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[RequireComponent(typeof(Collider2D))]
 public class Alarm : MonoBehaviour
 {
     [SerializeField] private AudioSource _audioSource;
+    [SerializeField] private Color _switcedOffColor;
+    [SerializeField] private Color _switchedOnCollor;
     [SerializeField] private float _volumeChangeRate;
 
+    private SpriteRenderer _renderer;
     private float _maxVolume = 1;
     private float _minVolume = 0;
     private bool _isWorking;
@@ -15,25 +17,27 @@ public class Alarm : MonoBehaviour
     private void Start()
     {
         _audioSource = GetComponent<AudioSource>();
-        _audioSource.volume = 0;
+        _renderer = GetComponent<SpriteRenderer>();
+        _renderer.color = _switcedOffColor;
+        _audioSource.volume = 1;
+        _isWorking = false;
     }
 
-    private void OnTriggerEnter2D(Collider2D collision)
+    public void Guard()
     {
-        if (collision.TryGetComponent<Player>(out Player player))
-        {
-            _audioSource.Play();
-            _isWorking = true;
-            StartCoroutine(VolumeChange());
-        }
-    }
-    private void OnTriggerExit2D(Collider2D collision)
-    {
-        if (collision.TryGetComponent<Player>(out Player player))
+        if (_isWorking == true)
         {
             _audioSource.Stop();
             _isWorking = false;
             StopCoroutine(VolumeChange());
+            _renderer.color = _switcedOffColor;
+        }
+        else
+        {
+            _audioSource.Play();
+            _isWorking = true;
+            StartCoroutine(VolumeChange());
+            _renderer.color = _switchedOnCollor;
         }
     }
 
@@ -52,7 +56,6 @@ public class Alarm : MonoBehaviour
                 else
                     targetVolume = _maxVolume;
             }
-
             yield return null;
         }
     }
