@@ -7,11 +7,13 @@ public class SpawnerSwitcher : MonoBehaviour
     [SerializeField] private float _spawnDelay;
     [SerializeField] private bool _isWorking;
 
-    private Spawner[] _allSpawners;
+    private SpawnPoint[] _allSpawners;
+    private WaitForSeconds _delayWait;
 
     private void Awake()
     {
-        _allSpawners = FindObjectsOfType<Spawner>();
+        _allSpawners = FindObjectsOfType<SpawnPoint>();
+        _delayWait = new WaitForSeconds (_spawnDelay);
     }
 
     private void Start()
@@ -26,7 +28,7 @@ public class SpawnerSwitcher : MonoBehaviour
             int randomSpawnerNumber = Random.Range(0, _allSpawners.Length);
             _allSpawners[randomSpawnerNumber].Spawn();
 
-            yield return new WaitForSeconds(_spawnDelay);
+            yield return _delayWait;
         }
     }
 }

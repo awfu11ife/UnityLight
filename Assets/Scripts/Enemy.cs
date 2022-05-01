@@ -5,13 +5,7 @@ using UnityEngine;
 public class Enemy : MonoBehaviour
 {
     [SerializeField] private float _speed;
-
-    private Transform _target;
-
-    private void Start()
-    {
-        _target = FindObjectOfType<Target>().transform;
-    }
+    [SerializeField] private Transform _target;
 
     private void Update()
     {
