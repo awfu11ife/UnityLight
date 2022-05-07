@@ -1,64 +1,50 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
-using DG.Tweening;
-
+using UnityEngine.Events;
+[RequireComponent(typeof(Animator))]
 public class Player : MonoBehaviour
 {
-    [SerializeField] private Slider _healthSlider;
+    public UnityEvent HealthChange;
+
+    private const string TakeDamageTrigger = "TakeDamage";
+    private const string HealTrigger = "Heal";
+    private const string IsDiedBool = "IsDied";
+
     [SerializeField] private int _maxHealth;
     [SerializeField] private int _currentHealth;
-    [SerializeField] private float _changeDuration;
     [SerializeField] private int _healValue;
 
     private int _minHealth = 0;
-    private Tweener _sliderAnimation;
     private Animator _animator;
+
+    public int MaxHealth => _maxHealth;
+    public int MinHealth => _minHealth;
+    public int CurrentHealth => _currentHealth;
 
     private void Start()
     {
         _animator = GetComponent<Animator>();
-        _healthSlider.maxValue = _maxHealth;
-        _healthSlider.minValue = _minHealth;
-        _healthSlider.value = _currentHealth;
-        _sliderAnimation = _healthSlider.DOValue((float)_currentHealth, _changeDuration).SetAutoKill(false);
+        _currentHealth = Mathf.Clamp(_currentHealth, _minHealth, _maxHealth);
     }
 
     public void TakeDamage(int damage)
     {
-        if (_currentHealth - damage > _minHealth)
-        {
             _currentHealth -= damage;
-            _animator.SetTrigger("TakeDamage");
-            _sliderAnimation.ChangeEndValue((float)_currentHealth, true).Restart();
-        }
-        else
-        {
-            _currentHealth = _minHealth;
-            _sliderAnimation.ChangeEndValue((float)_currentHealth, true).Restart();
-        }
+            _animator.SetTrigger(TakeDamageTrigger);
+            HealthChange?.Invoke();       
 
         if (_currentHealth == _minHealth)
-            _animator.SetBool("IsDied", true);
+            _animator.SetBool(IsDiedBool, true);
     }
 
     public void Heal()
     {
         if (_currentHealth != _maxHealth && _currentHealth != _minHealth)
-        {
-            if (_currentHealth + _healValue <= _maxHealth)
-            {
+        {          
                 _currentHealth += _healValue;
-                _animator.SetTrigger("Heal");
-                _sliderAnimation.ChangeEndValue((float)_currentHealth, true).Restart();
-            }
-            else
-            {
-                _currentHealth = _maxHealth;
-                _animator.SetTrigger("Heal");
-                _sliderAnimation.ChangeEndValue((float)_currentHealth, true).Restart();
-            }
+                _animator.SetTrigger(HealTrigger);
+                HealthChange?.Invoke();           
         }
     }
 }
